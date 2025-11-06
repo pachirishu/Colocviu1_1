@@ -1,5 +1,7 @@
 package ro.pub.cs.systems.eim.Colocviu1_1
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -7,10 +9,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import ro.pub.cs.systems.eim.Colocviu1_1.Constants.BUTOANE_APASATE
+import ro.pub.cs.systems.eim.Colocviu1_1.Constants.BUTOANE_AFISATE
 
 object Constants {
     const val BUTOANE_APASATE = "nrApasari"
+    const val BUTOANE_AFISATE = ""
 
 }
 class Colocviu1_1MainActivity : AppCompatActivity() {
@@ -21,7 +27,7 @@ class Colocviu1_1MainActivity : AppCompatActivity() {
     private lateinit var eastButton: Button
     private lateinit var westButton: Button
     private lateinit var southButton: Button
-    private lateinit var secondActivityButton: Button
+    private lateinit var navigateSecondaryActivity: Button
 
     private var coordonata = ""
     private var firstCoordonate = false
@@ -43,6 +49,8 @@ class Colocviu1_1MainActivity : AppCompatActivity() {
         southButton = findViewById(R.id.south_button)
         input = findViewById(R.id.coordonate)
         nrApasari = findViewById(R.id.apasari)
+        navigateSecondaryActivity = findViewById(R.id.navigate_button)
+
 
         northButton.setOnClickListener {
             if (firstCoordonate == false) {
@@ -83,6 +91,30 @@ class Colocviu1_1MainActivity : AppCompatActivity() {
             }
             butoane++
             nrApasari.setText(butoane.toString())
+        }
+
+        val activityResultsLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    Toast.makeText(this, "Register", Toast.LENGTH_LONG).show()
+                    input.setText("")
+                    butoane = 0
+                    nrApasari.setText(butoane.toString())
+                    firstCoordonate = false
+                } else {
+                    Toast.makeText(this, "Cancel", Toast.LENGTH_LONG).show()
+                    input.setText("")
+                    butoane = 0
+                    nrApasari.setText(butoane.toString())
+                    firstCoordonate = false
+                }
+            }
+
+        navigateSecondaryActivity.setOnClickListener {
+            val intent = Intent(this, Colocviu1_1SecondaryActivity::class.java).apply {
+                putExtra(BUTOANE_AFISATE, input.text.toString())
+            }
+            activityResultsLauncher.launch(intent)
         }
 
     }
